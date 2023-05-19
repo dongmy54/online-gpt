@@ -47,22 +47,33 @@ chatInput.placeholder = "Type your message...";
 chatInputWrapper.appendChild(chatInput);
 chatBoxDiv.appendChild(chatInputWrapper);
 
-// 添加输入框的键盘事件监听器
-chatInput.addEventListener("keyup", function (event) {
-  if (event.keyCode === 13) {
-    const message = chatInput.value;
-    if (message.trim()) {
-      chatMsgs.push({
-        message: message,
-        from: "user",
-        time: new Date(),
-      });
-      chatInput.value = "";
-      renderChatMsgs();
-      respondToMessage(message);
-    }
+// 添加聊天框输入框的键盘事件监听器
+chatInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && e.shiftKey) {
+    // 如果按下 shift + Enter，则插入一个换行符，而不提交内容。
+    e.preventDefault();
+    chatInput.value += "\n";
+  } else if (e.key === "Enter") {
+    // 如果只按下 Enter 键，则提交内容。
+    e.preventDefault();
+    sendMessage();
   }
 });
+
+// 添加发送消息的函数
+function sendMessage() {
+  const message = chatInput.value;
+  if (message.trim()) {
+    chatMsgs.push({
+      message: message,
+      from: "user",
+      time: new Date(),
+    });
+    chatInput.value = "";
+    renderChatMsgs();
+    respondToMessage(message);
+  }
+}
 
 // 添加聊天按钮元素并将其添加到页面中
 const chatButtonWrapper = document.createElement("div");
@@ -85,10 +96,12 @@ chatButton.addEventListener("click", function () {
 // 添加打开/关闭聊天框的函数
 function openChatBox() {
   chatBoxDiv.style.display = "block";
+  chatButtonWrapper.style.display = "none"; // 隐藏聊天按钮
 }
 
 function closeChatBox() {
   chatBoxDiv.style.display = "none";
+  chatButtonWrapper.style.display = "block"; // 显示聊天按钮 
 }
 
 // 渲染聊天消息列表
