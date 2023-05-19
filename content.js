@@ -1,225 +1,246 @@
-// 添加 chat 按钮
-const chatBtn = document.createElement("button");
-chatBtn.id = "chat-btn";
-chatBtn.textContent = "Chat";
-document.body.appendChild(chatBtn);
-
 // 添加聊天框元素
 const chatBoxDiv = document.createElement("div");
 chatBoxDiv.id = "chat-box";
 document.body.appendChild(chatBoxDiv);
 
-// 添加聊天内容展示区域
-const chatShowDiv = document.createElement("div");
-chatShowDiv.id = "chat-show";
-chatBoxDiv.appendChild(chatShowDiv);
-
-// 添加输入框和发送按钮
-const chatInputDiv = document.createElement("div");
-chatInputDiv.id = "chat-input";
-chatBoxDiv.appendChild(chatInputDiv);
-const chatInput = document.createElement("input");
-chatInput.type = "text";
-chatInput.id = "chat-message";
-chatInputDiv.appendChild(chatInput);
-const chatSendBtn = document.createElement("button");
-chatSendBtn.textContent = "Send";
-chatInputDiv.appendChild(chatSendBtn);
-
-// 添加事件监听器，以便点击 chat 按钮显示聊天框
-chatBtn.addEventListener("click", function() {
-  chatBoxDiv.style.display = "block";
-  chatBtn.style.display = "none";
-  chatInput.focus(); // 让输入框自动获取焦点
-});
-
-// 添加事件监听器，以便发送聊天消息
-chatSendBtn.addEventListener("click", function() {
-  sendMessage();
-});
-
-chatInput.addEventListener("keydown", function(event) {
-  if (event.keyCode === 13) { // 如果按下的是enter键
-    sendMessage();
-  }
-});
-
-function sendMessage() {
-  const message = chatInput.value.trim();
-  if (message) {
-    addMessageToChat(message, "user");
-    sendMessageToBot(message);
-    chatInput.value = "";
-  }
-}
-
-// 默认聊天对话
-const defaultChat = [
+// 添加默认聊天内容
+const defaultChatMsgs = [
   {
-    sender: "bot",
-    message: "Hello, how can I help you?",
-    lang: "en"
+    message: "Welcome to our website! How can I assist you today?",
+    from: "bot",
+    time: new Date(),
   },
-  {
-    sender: "user",
-    message: "Hi, I need help with my order.",
-    lang: "en"
-  },
-  {
-    sender: "bot",
-    message: "Sure, what is the order number?",
-    lang: "en"
-  },
-  {
-    sender: "user",
-    message: "123456",
-    lang: "en"
-  },
-  {
-    sender: "bot",
-    message:
-      "I'm sorry, we were not able to find your order. Could you please confirm the order number?",
-    lang: "en"
-  }
 ];
+let chatMsgs = defaultChatMsgs;
 
-// 将聊天内容添加到聊天框中
-function addMessageToChat(message, sender) {
-  const chatBubble = document.createElement("div");
-  chatBubble.className = "chat-bubble";
-  chatBubble.textContent = message;
-  if (sender === "user") {
-    chatBubble.classList.add("user-bubble");
-  } else {
-    chatBubble.classList.add("bot-bubble");
+// 创建聊天框头部
+const chatHeader = document.createElement("div");
+chatHeader.id = "chat-header";
+chatHeader.innerHTML = "<p>Online GPT</p>";
+chatBoxDiv.appendChild(chatHeader);
+
+// 创建聊天框关闭按钮
+const closeButton = document.createElement("span");
+closeButton.id = "close-button";
+closeButton.innerHTML = "&#10005;";
+chatHeader.appendChild(closeButton);
+
+// 添加关闭按钮的点击事件监听器
+closeButton.addEventListener("click", function () {
+  closeChatBox();
+});
+
+// 创建聊天消息列表
+const chatMsgList = document.createElement("ul");
+chatMsgList.id = "chat-msg-list";
+chatBoxDiv.appendChild(chatMsgList);
+
+// 将默认聊天内容添加到聊天消息列表
+renderChatMsgs();
+
+// 创建聊天输入框
+const chatInputWrapper = document.createElement("div");
+chatInputWrapper.id = "chat-input-wrapper";
+const chatInput = document.createElement("textarea");
+chatInput.id = "chat-input";
+chatInput.placeholder = "Type your message...";
+chatInputWrapper.appendChild(chatInput);
+chatBoxDiv.appendChild(chatInputWrapper);
+
+// 添加输入框的键盘事件监听器
+chatInput.addEventListener("keyup", function (event) {
+  if (event.keyCode === 13) {
+    const message = chatInput.value;
+    if (message.trim()) {
+      chatMsgs.push({
+        message: message,
+        from: "user",
+        time: new Date(),
+      });
+      chatInput.value = "";
+      renderChatMsgs();
+      respondToMessage(message);
+    }
   }
-  chatShowDiv.appendChild(chatBubble);
-  chatShowDiv.scrollTop = chatShowDiv.scrollHeight;
+});
+
+// 添加聊天按钮元素并将其添加到页面中
+const chatButtonWrapper = document.createElement("div");
+chatButtonWrapper.id = "chat-button-wrapper";
+const chatButton = document.createElement("button");
+chatButton.id = "chat-button";
+chatButton.innerText = "Chat";
+chatButtonWrapper.appendChild(chatButton);
+document.body.appendChild(chatButtonWrapper);
+
+// 添加点击事件监听器以打开/关闭聊天框
+chatButton.addEventListener("click", function () {
+  if (chatBoxDiv.style.display === "none") {
+    openChatBox();
+  } else {
+    closeChatBox();
+  }
+});
+
+// 添加打开/关闭聊天框的函数
+function openChatBox() {
+  chatBoxDiv.style.display = "block";
 }
 
-// 发送聊天消息
-function sendMessageToBot(message) {
-  // 这里可以使用 API 或其他服务器端代码来获取聊天消息的回复
-  // 为了演示，我们先直接在前端生成回复消息
-  const botMessage =
-    "I'm sorry, I'm just a demo bot and I do not have the capability to process your request.";
-  addMessageToChat(botMessage, "bot");
+function closeChatBox() {
+  chatBoxDiv.style.display = "none";
 }
 
-// 设置 CSS 样式
+// 渲染聊天消息列表
+function renderChatMsgs() {
+  chatMsgList.innerHTML = "";
+  chatMsgs.forEach((msg) => {
+    const li = document.createElement("li");
+    li.className = msg.from === "bot" ? "msg-bot" : "msg-user"; // 根据消息类型分配类
+    li.innerText = msg.message;
+    chatMsgList.appendChild(li);
+  });
+  // 将消息列表滚动到底部以便查看新的消息
+  chatMsgList.scrollTop = chatMsgList.scrollHeight;
+}
+
+// 假装回复消息
+function respondToMessage(message) {
+  setTimeout(() => {
+    chatMsgs.push({
+      message: `You said "${message}", right?`,
+      from: "bot",
+      time: new Date(),
+    });
+    renderChatMsgs();
+  }, 1000);
+}
+
+// 设置样式
 const style = document.createElement("style");
 style.textContent = `
-  #chat-btn {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    z-index: 9999;
-    background-color: #4CAF50;
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
   #chat-box {
-    display: none;
     position: fixed;
-    bottom: 10px;
-    right: 10px;
+    bottom: 20px;
+    right: 20px;
     z-index: 9999;
     background-color: #fff;
-    border: 1px solid #ccc;
-    width: 300px;
-    max-height: 400px;
-    overflow: hidden;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
-    border-radius: 5px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    display: none;
+    max-width: 400px;
   }
-  #chat-show {
-    height: 100%;
-    max-height: 350px;
-    padding: 10px;
-    overflow-y: auto;
-  }
-  #chat-input {
+  #chat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    border-top: 1px solid #ccc;
+    margin-bottom: 20px;
   }
-  #chat-message {
-    flex-grow: 1;
-    border: none;
-    border-bottom: 1px solid #ccc;
-    margin-right: 10px;
-    outline: none;
-    font-size: 14px;
-  }
-  #chat-input button {
-    border: none;
-    background-color: #4CAF50;
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
+  #close-button {
+    color: #ccc;
     cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease-in-out;
   }
-  .chat-bubble {
-    display: inline-block;
-    max-width: 80%;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-  .user-bubble {
-    background-color: #4CAF50;
-    color: #fff;
-    align-self: flex-end;
-  }
-  .bot-bubble {
-    background-color: #f2f2f2;
-    color: #4CAF50;
-    align-self: flex-start;
-  }
-  #chat-close-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: none;
-    border: none;
-    width: 25px;
-    height: 25px;
-    line-height: 20px;
-    text-align: center;
-    font-size: 20px;
-    color: #999;
-    cursor: pointer;
-    outline: none;
-  }
-  #chat-close-btn:hover {
+  #close-button:hover {
     color: #333;
   }
-`;
+  #chat-msg-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 500px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+  #chat-input-wrapper {
+    margin-top: 20px;
+  }
+  #chat-input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: #f6f6f6;
+    /* 新增样式 */
+    min-height: 40px; /* 改为 min-height */
+    height: auto; /* 改为 auto，以支持多行文本输入 */
+    width: 100%;
+    box-sizing: border-box;
+    margin: 5px 0;
+    resize: vertical; /* 允许上下调整输入框的大小 */
+  }
+  #chat-input::placeholder {
+    color: #ccc;
+  }
+  #chat-input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.75);
+  }
+  #chat-button-wrapper {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+  }
+  #chat-button {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  #chat-button:hover {
+    background-color: #222;
+  }
+  /* 新增样式 */
+  .msg-user,
+  .msg-bot {
+    display: block;
+    clear: both;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    position: relative;
+  }
+  .msg-user {
+    float: right;
+    background-color: #4caf50;
+    color: #fff;
+  }
+  .msg-bot {
+    float: left;
+    background-color: #f6f6f6;
+    color: #333;
+  }
+  #chat-header {
+    text-align: center;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #dcdcdc;
+  }
 
+  #chat-header p {
+    margin: 0;
+    font-weight: bold;
+    font-size: 18px;
+    color: #444;
+  }
+`;
 document.head.appendChild(style);
 
-// 显示默认聊天对话
-defaultChat.forEach(chat => {
-  addMessageToChat(chat.message, chat.sender);
-});
+// 显示默认聊天消息
+function showDefaultChatMsgs() {
+  chatMsgs = defaultChatMsgs;
+  renderChatMsgs();
+}
+showDefaultChatMsgs();
 
-// 添加关闭按钮
-const chatCloseBtn = document.createElement("button");
-chatCloseBtn.textContent = "X";
-chatCloseBtn.id = "chat-close-btn";
-chatBoxDiv.appendChild(chatCloseBtn);
 
-// 添加事件监听器，以便点击关闭按钮隐藏聊天框
-chatCloseBtn.addEventListener("click", function() {
-  chatBoxDiv.style.display = "none";
-  chatBtn.style.display = "block";
-});
 
 
 
