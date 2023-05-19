@@ -1,0 +1,22 @@
+{
+  "name": "Your Extension Name",
+  "version": "1.0",
+  "manifest_version": 2,
+  "description": "A brief description of your extension",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": ["tabs", "storage", "http://*/*", "https://*/*"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "browser_action": {
+    "default_icon": "images/icon.jpeg",
+    "default_popup": "popup.html"
+  }
+}
