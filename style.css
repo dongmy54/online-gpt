@@ -34,7 +34,6 @@
   margin-bottom: 20px;
 }
 #chat-input-wrapper {
-  margin-top: 20px;
   position: relative; /* 添加相对定位 */
 }
 #chat-input {
@@ -185,3 +184,32 @@ code .comment {
     transform: rotate(360deg);
   }
 }
+
+.function-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  background-color: #f2f2f2;
+  padding: 10px;
+}
+
+.function-button {
+  padding: 8px 16px;
+  background-color: #337ab7;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.function-button:hover {
+  background-color: #23527c;
+}
+
+.function-button:active {
+  background-color: #1c4566;
+}
+
+
+

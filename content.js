@@ -57,24 +57,25 @@ chatInput.addEventListener("keydown", function (e) {
   } else if (e.key === "Enter") {
     // 如果只按下 Enter 键，则提交内容。
     e.preventDefault();
-    sendMessage();
+
+    const message = chatInput.value;
+    if (message.trim()){
+      sendMessage(message);
+    }
   }
 });
 
 // 添加发送消息的函数
-function sendMessage() {
-  const message = chatInput.value;
-  if (message.trim()) {
-    chatMsgs.push({
-      message: message,
-      from: "user",
-      time: new Date(),
-    });
-    chatInput.value = "";
-    renderChatMsgs();
-    showLoading();
-    respondToMessage(message);
-  }
+function sendMessage(message) {
+  chatMsgs.push({
+    message: message,
+    from: "user",
+    time: new Date(),
+  });
+  chatInput.value = "";
+  renderChatMsgs();
+  showLoading();
+  respondToMessage(message);
 }
 
 // 添加聊天按钮元素并将其添加到页面中
@@ -175,7 +176,7 @@ function hideLoading() {
 
 
 // 设置你的 OpenAI API 密钥
-const OPENAI_API_KEY = "";
+const OPENAI_API_KEY = "you key";
 
 // 更新 respondToMessage 函数
 function respondToMessage(message) {
@@ -234,6 +235,60 @@ function showDefaultChatMsgs() {
   renderChatMsgs();
 }
 showDefaultChatMsgs();
+
+
+
+
+
+// 创建翻译按钮容器 div
+var translationButtonContainer = document.createElement("div");
+translationButtonContainer.setAttribute("id", "translation-button-container");
+translationButtonContainer.classList.add("function-button-container"); // 添加自定义的样式类名
+
+// 创建翻译按钮
+var translationButton = document.createElement("button");
+translationButton.setAttribute("id", "translation-button");
+translationButton.textContent = "翻译"; // 按钮文本，可根据需要进行修改
+translationButton.classList.add("function-button"); // 添加自定义的样式类名
+
+// 将翻译按钮添加到翻译按钮容器中
+translationButtonContainer.appendChild(translationButton);
+
+// 将翻译按钮容器插入到 chat-input-wrapper 元素之前
+chatInputWrapper.parentNode.insertBefore(
+  translationButtonContainer,
+  chatInputWrapper
+);
+
+// 定义翻译模版
+var translationTemplate = "将下面内容翻译为中文：\n %{message}%";
+
+// 定义其他模版
+// var otherTemplate = "其他模版：%{message}%";
+
+// 监听翻译按钮的点击事件
+translationButton.addEventListener("click", function () {
+  // 获取输入框的内容
+  var content = document.getElementById("chat-input").value;
+
+  // 根据定义的模版修改输入框的内容
+  var modifiedContent = applyTemplate(translationTemplate, content);
+
+  // 发送请求到后端接口
+  sendMessage(modifiedContent);
+});
+
+// 应用模版函数
+function applyTemplate(template, message) {
+  // 使用正则表达式替换模版中的占位符 %{message} 为实际内容
+  var modifiedContent = template.replace("%{message}%", message);
+  
+  return modifiedContent;
+}
+
+
+
+
 
 // 获取样式表文件的绝对路径
 const styleSheetPath = chrome.extension.getURL('style.css');
