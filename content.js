@@ -72,6 +72,7 @@ function sendMessage() {
     });
     chatInput.value = "";
     renderChatMsgs();
+    showLoading();
     respondToMessage(message);
   }
 }
@@ -99,6 +100,7 @@ function openChatBox() {
   if (!document.body.contains(chatBoxDiv)) {
     document.body.appendChild(chatBoxDiv);
   }
+  hideLoading();// 一开始加载动画是隐藏的
   chatBoxDiv.style.display = "block";
   chatButtonWrapper.style.display = "none"; // 隐藏聊天按钮
 }
@@ -143,6 +145,34 @@ function parseMarkdown(content) {
     return content;
   }
 }
+
+// 创建加载圆圈元素
+const loadingDiv = document.createElement("div");
+loadingDiv.id = "loading";
+const spinnerDiv = document.createElement("div");
+spinnerDiv.classList.add("loading-spinner");
+loadingDiv.appendChild(spinnerDiv);
+chatInputWrapper.appendChild(loadingDiv);
+
+
+// 显示加载动画
+function showLoading() {
+  const loadingDiv = document.getElementById("loading");
+  if (loadingDiv) {
+    loadingDiv.style.display = "block";
+  }
+  chatInput.disabled = true; // 禁用聊天输入框
+}
+
+// 隐藏加载动画
+function hideLoading() {
+  const loadingDiv = document.getElementById("loading");
+  if (loadingDiv) {
+    loadingDiv.style.display = "none";
+  }
+  chatInput.disabled = false; // 启用聊天输入框
+}
+
 
 // 设置你的 OpenAI API 密钥
 const OPENAI_API_KEY = "";
@@ -189,7 +219,12 @@ function respondToMessage(message) {
         time: new Date(),
       });
       renderChatMsgs();
+    })
+    .finally(() => {
+      // 隐藏加载动画
+      hideLoading();
     });
+    ;
 }
 
 // 设置样式
@@ -232,6 +267,7 @@ style.textContent = `
   }
   #chat-input-wrapper {
     margin-top: 20px;
+    position: relative; /* 添加相对定位 */
   }
   #chat-input {
     flex: 1;
@@ -353,6 +389,33 @@ style.textContent = `
   code .comment {
     color: #75715e;
     font-style: italic;
+  }
+  
+  #loading {
+    position: absolute;
+    top: 50%; /* 将加载圆圈垂直居中 */
+    left: 50%; /* 将加载圆圈水平居中 */
+    transform: translate(-50%, -50%); /* 调整加载圆圈的位置 */
+  }
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 5px solid #f3f3f3;
+    border-top: 4px solid #2E3638;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  /* 加载动画样式 */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+      border-color: #D9D9D9; /* 设置起始颜色为聊天框主题色 */
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 document.head.appendChild(style);
