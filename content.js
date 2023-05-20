@@ -1,6 +1,7 @@
 // 添加聊天框元素
 const chatBoxDiv = document.createElement("div");
 chatBoxDiv.id = "chat-box";
+chatBoxDiv.style.display = "none" // 首次进入样式 此时css可能没生效
 document.body.appendChild(chatBoxDiv);
 
 // 添加默认聊天内容
@@ -95,6 +96,9 @@ chatButton.addEventListener("click", function () {
 
 // 添加打开/关闭聊天框的函数
 function openChatBox() {
+  if (!document.body.contains(chatBoxDiv)) {
+    document.body.appendChild(chatBoxDiv);
+  }
   chatBoxDiv.style.display = "block";
   chatButtonWrapper.style.display = "none"; // 隐藏聊天按钮
 }
