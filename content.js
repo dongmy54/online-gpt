@@ -145,7 +145,7 @@ function parseMarkdown(content) {
 }
 
 // 设置你的 OpenAI API 密钥
-const OPENAI_API_KEY = "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";
+const OPENAI_API_KEY = "Your api key";
 
 // 更新 respondToMessage 函数
 // 更新 respondToMessage 函数
