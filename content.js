@@ -145,9 +145,8 @@ function parseMarkdown(content) {
 }
 
 // 设置你的 OpenAI API 密钥
-const OPENAI_API_KEY = "Your api key";
+const OPENAI_API_KEY = "";
 
-// 更新 respondToMessage 函数
 // 更新 respondToMessage 函数
 function respondToMessage(message) {
   const apiUrl = "https://api.openai.com/v1/chat/completions";
@@ -319,7 +318,6 @@ style.textContent = `
     line-height: 1.6;
     padding: 16px;
     margin: 20px 0;
-    white-space: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
     text-align: left;
