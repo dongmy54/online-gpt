@@ -113,24 +113,84 @@ function renderChatMsgs() {
   chatMsgList.innerHTML = "";
   chatMsgs.forEach((msg) => {
     const li = document.createElement("li");
-    li.className = msg.from === "bot" ? "msg-bot" : "msg-user"; // 根据消息类型分配类
-    li.innerText = msg.message;
+    li.className = msg.from === "bot" ? "msg-bot" : "msg-user";
+    li.innerHTML = parseMarkdown(msg.message); // 解析 Markdown 内容并设置 innerHTML
     chatMsgList.appendChild(li);
   });
-  // 将消息列表滚动到底部以便查看新的消息
   chatMsgList.scrollTop = chatMsgList.scrollHeight;
 }
 
-// 假装回复消息
-function respondToMessage(message) {
-  setTimeout(() => {
-    chatMsgs.push({
-      message: `You said "${message}", right?`,
-      from: "bot",
-      time: new Date(),
+// 解析 Markdown 内容并添加美化样式
+function parseMarkdown(content) {
+  if (typeof marked === 'object' && marked.parse) {
+    const html = marked.parse(content);
+    const div = document.createElement('div');
+    div.innerHTML = html;
+
+    // 添加自定义 CSS 样式
+    div.querySelectorAll('p').forEach((p) => {
+      p.classList.add('markdown-p');
     });
-    renderChatMsgs();
-  }, 1000);
+    div.querySelectorAll('pre').forEach((pre) => {
+      pre.classList.add('markdown-pre');
+    });
+    div.querySelectorAll('code').forEach((code) => {
+      code.classList.add('markdown-code');
+    });
+
+    return div.innerHTML;
+  } else {
+    return content;
+  }
+}
+
+// 设置你的 OpenAI API 密钥
+const OPENAI_API_KEY = "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";
+
+// 更新 respondToMessage 函数
+// 更新 respondToMessage 函数
+function respondToMessage(message) {
+  const apiUrl = "https://api.openai.com/v1/chat/completions";
+
+  fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "user", content: message }
+      ]
+    })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("API request failed.");
+      }
+      return response.json();
+    })
+    .then(data => {
+      const replyMessage = data.choices[0].message.content;
+      console.log(`${replyMessage}`);
+      chatMsgs.push({
+        message: replyMessage,
+        from: "bot",
+        time: new Date(),
+      });
+      renderChatMsgs();
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      const errorMessage = "Oops! Something went wrong. Please try again later.";
+      chatMsgs.push({
+        message: errorMessage,
+        from: "bot",
+        time: new Date(),
+      });
+      renderChatMsgs();
+    });
 }
 
 // 设置样式
@@ -246,6 +306,55 @@ style.textContent = `
     font-weight: bold;
     font-size: 18px;
     color: #444;
+  }
+
+  /* 自定义 CSS 样式 */
+  pre {
+    background-color: #2d2d2d;
+    color: #f8f8f8;
+    border: 1px solid #444444;
+    border-radius: 3px;
+    font-size: 14px;
+    font-family: 'Consolas', 'Menlo', 'Monaco', 'Courier New', monospace;
+    line-height: 1.6;
+    padding: 16px;
+    margin: 20px 0;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-align: left;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  code {
+    background-color: #272822;
+    color: #f8f8f8;
+    padding: 2px 6px;
+    border-radius: 3px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    color: inherit;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  code .keyword {
+    color: #f92672;
+  }
+  code .string {
+    color: #a6e22e;
+  }
+  code .number {
+    color: #ae81ff;
+  }
+  code .comment {
+    color: #75715e;
+    font-style: italic;
   }
 `;
 document.head.appendChild(style);
