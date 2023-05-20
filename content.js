@@ -176,7 +176,7 @@ function hideLoading() {
 
 
 // 设置你的 OpenAI API 密钥
-const OPENAI_API_KEY = "you key";
+const OPENAI_API_KEY = "";
 
 // 更新 respondToMessage 函数
 function respondToMessage(message) {
@@ -240,54 +240,53 @@ showDefaultChatMsgs();
 
 
 
-// 创建翻译按钮容器 div
-var translationButtonContainer = document.createElement("div");
-translationButtonContainer.setAttribute("id", "translation-button-container");
-translationButtonContainer.classList.add("function-button-container"); // 添加自定义的样式类名
+// 添加按钮容器
+const functionButtonContainer = document.createElement("div");
+functionButtonContainer.className = "function-button-container";
 
-// 创建翻译按钮
-var translationButton = document.createElement("button");
-translationButton.setAttribute("id", "translation-button");
-translationButton.textContent = "翻译"; // 按钮文本，可根据需要进行修改
-translationButton.classList.add("function-button"); // 添加自定义的样式类名
-
-// 将翻译按钮添加到翻译按钮容器中
-translationButtonContainer.appendChild(translationButton);
-
-// 将翻译按钮容器插入到 chat-input-wrapper 元素之前
-chatInputWrapper.parentNode.insertBefore(
-  translationButtonContainer,
-  chatInputWrapper
-);
-
-// 定义翻译模版
-var translationTemplate = "将下面内容翻译为中文：\n %{message}%";
-
-// 定义其他模版
-// var otherTemplate = "其他模版：%{message}%";
-
-// 监听翻译按钮的点击事件
-translationButton.addEventListener("click", function () {
-  // 获取输入框的内容
-  var content = document.getElementById("chat-input").value;
-
-  // 根据定义的模版修改输入框的内容
-  var modifiedContent = applyTemplate(translationTemplate, content);
-
-  // 发送请求到后端接口
-  sendMessage(modifiedContent);
-});
+// 创建按钮的通用函数
+function createButton(className, label, clickHandler) {
+  const button = document.createElement("button");
+  button.className = "function-button " + className;
+  button.textContent = label;
+  button.addEventListener("click", clickHandler);
+  functionButtonContainer.appendChild(button);
+}
 
 // 应用模版函数
 function applyTemplate(template, message) {
   // 使用正则表达式替换模版中的占位符 %{message} 为实际内容
   var modifiedContent = template.replace("%{message}%", message);
-  
   return modifiedContent;
 }
 
+// 翻译按钮的点击处理函数
+function translateMessage() {
+  const message = chatInput.value.trim();
+  if (message !== "") {
+    const template = "将下面内容翻译为中文：\n %{message}%";
+    const translatedMessage = applyTemplate(template, message);
+    sendMessage(translatedMessage);
+  }
+}
 
+// 解释按钮的点击处理函数
+function explainMessage() {
+  const message = chatInput.value.trim();
+  if (message !== "") {
+    const template = "详细解释下面内容：\n %{message}%";
+    const explainedMessage = applyTemplate(template, message);
+    sendMessage(explainedMessage);
+  }
+}
 
+// 创建翻译按钮
+createButton("translation-button", "翻译", translateMessage);
+// 创建解释按钮
+createButton("explanation-button", "解释", explainMessage);
+
+// 将按钮容器添加到 chat-input-wrapper 元素前面
+chatInputWrapper.parentNode.insertBefore(functionButtonContainer, chatInputWrapper);
 
 
 // 获取样式表文件的绝对路径
