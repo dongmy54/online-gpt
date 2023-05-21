@@ -12,9 +12,9 @@
   ],
   "action": {
     "default_icon": {
-      "16": "images/icon.jpeg",
-      "48": "images/icon.jpeg",
-      "128": "images/icon.jpeg"
+      "16": "images/16icon.png",
+      "48": "images/48icon.png",
+      "128": "images/128icon.png"
     },
     "default_popup": "popup.html"
   },
@@ -35,9 +35,9 @@
     "open_in_tab": true
   },
   "icons": {
-    "16": "images/icon.jpeg",
-    "48": "images/icon.jpeg",
-    "128": "images/icon.jpeg"
+    "16": "images/16icon.png",
+    "48": "images/48icon.png",
+    "128": "images/128icon.png"
   },
   "web_accessible_resources": [
     {
