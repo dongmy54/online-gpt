@@ -62,17 +62,19 @@
 #online-chat-container #chat-button-wrapper {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  right: 10px;
   z-index: 9999;
 }
 #online-chat-container #chat-button {
   background-color: #333;
   color: #fff;
-  padding: 10px 20px;
+  padding: 10px 16px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
+  border-radius: 5px;
+  font-size: 16px;
 }
 #online-chat-container #chat-button:hover {
   background-color: #222;
