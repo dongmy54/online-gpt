@@ -11,7 +11,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["libs/marked.js", "content.js"],
+      "js": ["libs/marked.js", "content.js", "style.js"],
       "run_at": "document_end"
     }
   ],
