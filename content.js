@@ -77,8 +77,16 @@ chatInput.addEventListener("keydown", function (e) {
   }
 });
 
+
 // 添加发送消息的函数
 function sendMessage(message) {
+  if (!apiKey){
+    // 未获取到 API 密钥，弹窗提示
+    alert('请先到插件选项中配置 OpenAI API 密钥');
+    location.reload(); // 刷新当前页面
+    return;
+  }
+  
   chatMsgs.push({
     message: message,
     from: "user",
@@ -185,7 +193,19 @@ function hideLoading() {
 
 
 // 设置你的 OpenAI API 密钥
-const OPENAI_API_KEY = "";
+let apiKey;
+
+chrome.storage.local.get('OPENAI_API_KEY', function(result) {
+  apiKey = result.OPENAI_API_KEY;
+
+  // 检查是否成功获取到 API 密钥
+  if (!apiKey) {
+    // 未获取到 API 密钥，弹窗提示
+    console.log('请先到插件选项中配置 OpenAI API 密钥');
+    return;
+  }
+})
+
 
 // 更新 respondToMessage 函数
 function respondToMessage(message) {
@@ -195,7 +215,7 @@ function respondToMessage(message) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${OPENAI_API_KEY}`
+      "Authorization": `Bearer ${apiKey}`
     },
     body: JSON.stringify({
       model: "gpt-3.5-turbo",
@@ -222,7 +242,7 @@ function respondToMessage(message) {
     })
     .catch(error => {
       console.error("Error:", error);
-      const errorMessage = "Oops! Something went wrong. Please try again later.";
+      const errorMessage = `Oops! Something went wrong. Error: ${error}`;
       chatMsgs.push({
         message: errorMessage,
         from: "bot",
