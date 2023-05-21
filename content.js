@@ -237,6 +237,30 @@ function showDefaultChatMsgs() {
 showDefaultChatMsgs();
 
 
+// 获取页面内容
+function getPageContent() {
+  // 获取网页中的所有 <p> 标签元素（排除 chat-box 元素）
+  var elements = document.querySelectorAll('p:not(#chat-box p)');
+
+  // 创建一个空数组用于存储文本内容
+  var contentArray = [];
+
+  // 遍历标签元素，获取文本内容并添加到数组中
+  elements.forEach(function(element) {
+    var textContent = element.textContent.trim();
+    if (textContent.length > 0) {
+      contentArray.push(textContent);
+    }
+  });
+
+  // 将数组中的文本内容整合成一个完整的文本
+  var completeContent = contentArray.join('\n');
+
+  return completeContent;
+}
+
+// 调用函数获取网页内容
+var pageContent = getPageContent();
 
 
 
@@ -280,13 +304,38 @@ function explainMessage() {
   }
 }
 
+// 摘要按钮的点击处理函数
+function summarizeMessage() {
+  var message = "";
+  var chatInput = document.getElementById("chat-input");
+
+  // 检查输入框中是否有内容
+  if (chatInput.value.trim().length > 0) {
+    message = chatInput.value.trim(); // 从输入框获取文本作为摘要的消息
+  } else {
+    message = getPageContent(); // 从整个网页获取文本作为摘要的消息
+  }
+
+  const template = "将下面内容生成中文摘要：\n %{message}%";
+  const summary = applyTemplate(template, message);
+
+  sendMessage(summary);
+}
+
+
 // 创建翻译按钮
 createButton("translation-button", "翻译", translateMessage);
 // 创建解释按钮
 createButton("explanation-button", "解释", explainMessage);
+// 创建摘要按钮
+createButton("summary-button", "摘要", summarizeMessage);
 
 // 将按钮容器添加到 chat-input-wrapper 元素前面
 chatInputWrapper.parentNode.insertBefore(functionButtonContainer, chatInputWrapper);
+
+
+
+
 
 
 // 获取样式表文件的绝对路径
