@@ -45,7 +45,7 @@
   background-color: #f6f6f6;
   /* 新增样式 */
   min-height: 40px; /* 改为 min-height */
-  height: auto; /* 改为 auto，以支持多行文本输入 */
+  height: 120px; /* 改为 auto，以支持多行文本输入 */
   width: 100%;
   box-sizing: border-box;
   margin: 5px 0;
@@ -214,8 +214,8 @@ code .comment {
 
 .clear-button {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 5px;
+  bottom: 5px;
   cursor: pointer;
   color: #999;
   font-size: 18px;
@@ -232,4 +232,12 @@ code .comment {
 .input-wrapper-with-clear-button textarea {
   padding-right: 30px;
 }
+
+.input-wrapper-with-clear-button .clear-button {
+  position: absolute;
+  right: 10px;
+  bottom: 18px;
+}
+
+
 

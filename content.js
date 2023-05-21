@@ -7,7 +7,7 @@ document.body.appendChild(chatBoxDiv);
 // 添加默认聊天内容
 const defaultChatMsgs = [
   {
-    message: "Welcome to our website! How can I assist you today?",
+    message: "欢迎来到online-gpt!\n 1. 你可以像在使用gpt那样聊天;\n 2. 也可以点击翻译、解释、摘要按钮，对输入框中的内容进行翻译、解释、生成摘要;\n 3. 当你选中网页上任何一段文本后,文本内容将自动填入输入框;\n 4. 摘要支持对网页整个页面内容进行摘要（输入框可以不输入内容）",
     from: "bot",
     time: new Date(),
   },
