@@ -29,7 +29,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 500px;
+  max-height: 350px;
   overflow-y: auto;
   margin-bottom: 20px;
 }
@@ -237,6 +237,7 @@ code .comment {
   position: absolute;
   right: 10px;
   bottom: 18px;
+  color: #E85A56;
 }
 
 
