@@ -1,5 +1,5 @@
 // 获取样式表文件的绝对路径
-const styleSheetPath = chrome.extension.getURL('style.css');
+const styleSheetPath = chrome.runtime.getURL('style.css');
 
 // 创建一个<link>元素来加载样式表
 const linkElement = document.createElement('link');

@@ -1,26 +1,48 @@
 {
+  "manifest_version": 3,
   "name": "Online-GPT",
   "version": "1.0",
-  "manifest_version": 2,
   "description": "Chat with GPT on any webpage",
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js",
+    "type": "module"
   },
-  "permissions": ["tabs", "storage", "http://*/*", "https://*/*"],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "images/icon.jpeg",
+      "48": "images/icon.jpeg",
+      "128": "images/icon.jpeg"
+    },
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "scripting"
+  ],
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
+      "matches": ["*://*/*"],
       "js": ["libs/marked.js", "content.js", "style.js"],
       "run_at": "document_end"
     }
   ],
-  "options_page": "config.html",
-  "browser_action": {
-    "default_icon": "images/icon.jpeg",
-    "default_popup": "popup.html"
+  "options_ui": {
+    "page": "config.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "images/icon.jpeg",
+    "48": "images/icon.jpeg",
+    "128": "images/icon.jpeg"
   },
   "web_accessible_resources": [
-    "style.css"
+    {
+      "resources": ["style.css"],
+      "matches": ["*://*/*"]
+    }
   ]
 }

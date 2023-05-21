@@ -80,7 +80,7 @@ chatInput.addEventListener("keydown", function (e) {
 
 // 添加发送消息的函数
 function sendMessage(message) {
-  if (!apiKey){
+  if (!apiKey) {
     // 未获取到 API 密钥，弹窗提示
     alert('请先到插件选项中配置 OpenAI API 密钥');
     location.reload(); // 刷新当前页面
