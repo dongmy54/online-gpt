@@ -212,5 +212,24 @@ code .comment {
   background-color: #1c4566;
 }
 
+.clear-button {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  cursor: pointer;
+  color: #999;
+  font-size: 18px;
+}
 
+.clear-button:hover {
+  color: #666;
+}
+
+.input-wrapper-with-clear-button {
+  position: relative;
+}
+
+.input-wrapper-with-clear-button textarea {
+  padding-right: 30px;
+}
 

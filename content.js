@@ -334,8 +334,33 @@ createButton("summary-button", "摘要", summarizeMessage);
 chatInputWrapper.parentNode.insertBefore(functionButtonContainer, chatInputWrapper);
 
 
+// 监听文本选择事件
+document.addEventListener("mouseup", function(event) {
+  var selectedText = window.getSelection().toString();
+
+  // 检查聊天框是否处于显示状态
+  var chatBox = document.getElementById("chat-box");
+  if (chatBox.style.display === "block" && selectedText.length > 0) {
+    var chatInput = document.getElementById("chat-input");
+    chatInput.value = selectedText;
+  }
+});
 
 
+// 创建清除按钮
+const clearButton = document.createElement("span");
+clearButton.className = "clear-button";
+clearButton.innerHTML = "清除"; // 使用 HTML 实体编码表示 "✕"
+
+// 点击清除按钮时清空聊天输入框
+clearButton.addEventListener("click", function () {
+  chatInput.value = "";
+});
+
+// 将清除按钮添加到聊天输入框中
+chatInputWrapper.appendChild(clearButton);
+// 添加样式类到聊天输入框容器
+chatInputWrapper.classList.add("input-wrapper-with-clear-button");
 
 
 // 获取样式表文件的绝对路径
