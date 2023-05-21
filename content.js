@@ -1,8 +1,20 @@
+// 添加最外层容器
+const onlineChatContainer = document.createElement("div");
+onlineChatContainer.id = "online-chat-container";
+document.body.appendChild(onlineChatContainer);
+
 // 添加聊天框元素
 const chatBoxDiv = document.createElement("div");
 chatBoxDiv.id = "chat-box";
 chatBoxDiv.style.display = "none" // 首次进入样式 此时css可能没生效
-document.body.appendChild(chatBoxDiv);
+onlineChatContainer.appendChild(chatBoxDiv);
+
+// chat按钮-独立于chat-box
+const chatButtonWrapper = document.createElement("div");
+chatButtonWrapper.id = "chat-button-wrapper";
+onlineChatContainer.appendChild(chatButtonWrapper);
+
+
 
 // 添加默认聊天内容
 const defaultChatMsgs = [
@@ -79,13 +91,10 @@ function sendMessage(message) {
 }
 
 // 添加聊天按钮元素并将其添加到页面中
-const chatButtonWrapper = document.createElement("div");
-chatButtonWrapper.id = "chat-button-wrapper";
 const chatButton = document.createElement("button");
 chatButton.id = "chat-button";
 chatButton.innerText = "Chat";
 chatButtonWrapper.appendChild(chatButton);
-document.body.appendChild(chatButtonWrapper);
 
 // 添加点击事件监听器以打开/关闭聊天框
 chatButton.addEventListener("click", function () {

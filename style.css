@@ -1,4 +1,4 @@
-#chat-box {
+#online-chat-container #chat-box {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -10,22 +10,22 @@
   display: none;
   max-width: 400px;
 }
-#chat-header {
+#online-chat-container #chat-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
-#close-button {
+#online-chat-container #close-button {
   color: #ccc;
   cursor: pointer;
   user-select: none;
   transition: color 0.2s ease-in-out;
 }
-#close-button:hover {
+#online-chat-container #close-button:hover {
   color: #333;
 }
-#chat-msg-list {
+#online-chat-container #chat-msg-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -33,10 +33,11 @@
   overflow-y: auto;
   margin-bottom: 20px;
 }
-#chat-input-wrapper {
+
+#online-chat-container #chat-input-wrapper {
   position: relative; /* 添加相对定位 */
 }
-#chat-input {
+#online-chat-container #chat-input {
   flex: 1;
   padding: 10px;
   font-size: 16px;
@@ -51,20 +52,20 @@
   margin: 5px 0;
   resize: vertical; /* 允许上下调整输入框的大小 */
 }
-#chat-input::placeholder {
+#online-chat-container #chat-input::placeholder {
   color: #ccc;
 }
-#chat-input:focus {
+#online-chat-container #chat-input:focus {
   border-color: #4CAF50;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.75);
 }
-#chat-button-wrapper {
+#online-chat-container #chat-button-wrapper {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 9999;
 }
-#chat-button {
+#online-chat-container #chat-button {
   background-color: #333;
   color: #fff;
   padding: 10px 20px;
@@ -73,12 +74,11 @@
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
 }
-#chat-button:hover {
+#online-chat-container #chat-button:hover {
   background-color: #222;
 }
 /* 新增样式 */
-.msg-user,
-.msg-bot {
+#online-chat-container .msg-user,.msg-bot {
   display: block;
   clear: both;
   padding: 10px;
@@ -86,24 +86,57 @@
   margin-bottom: 5px;
   position: relative;
 }
-.msg-user {
+#online-chat-container .msg-user {
   float: right;
   background-color: #4caf50;
   color: #fff;
 }
-.msg-bot {
+#online-chat-container .msg-bot {
   float: left;
   background-color: #f6f6f6;
   color: #333;
 }
-#chat-header {
+
+#online-chat-container .msg-bot ul, ol {
+  padding: 0;
+  margin: 0 0 10px 25px;
+}
+
+#online-chat-container .msg-msg ul, ol {
+  padding: 0;
+  margin: 0 0 10px 25px;
+}
+
+#online-chat-container #chat-msg-list li {
+  font-family: "Myriad Pro", "Verdana, Arial, Tahoma";
+  font-size: 14px;
+  line-height: 20px;
+  list-style-image: none;
+  text-align: left;
+  text-size-adjust: 100%;
+}
+
+#online-chat-container #chat-msg-list p {
+  margin: 0 0 10px;
+}
+
+#online-chat-container #chat-msg-list ol {
+  padding-left: 10px;
+}
+
+#online-chat-container #chat-msg-list ol li {
+  list-style-type: decimal;
+  margin-bottom: 10px;
+}
+
+#online-chat-container #chat-header {
   text-align: center;
   padding: 10px;
   background-color: #f2f2f2;
   border-bottom: 1px solid #dcdcdc;
 }
 
-#chat-header p {
+#online-chat-container #chat-header p {
   margin: 0;
   font-weight: bold;
   font-size: 18px;
@@ -111,7 +144,7 @@
 }
 
 /* 自定义 CSS 样式 */
-pre {
+#online-chat-container pre {
   background-color: #2d2d2d;
   color: #f8f8f8;
   border: 1px solid #444444;
@@ -127,7 +160,7 @@ pre {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-code {
+#online-chat-container code {
   background-color: #272822;
   color: #f8f8f8;
   padding: 2px 6px;
@@ -135,7 +168,7 @@ code {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-pre code {
+#online-chat-container pre code {
   background-color: transparent;
   padding: 0;
   border-radius: 0;
@@ -144,28 +177,28 @@ pre code {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-code .keyword {
+#online-chat-container code .keyword {
   color: #f92672;
 }
-code .string {
+#online-chat-container code .string {
   color: #a6e22e;
 }
-code .number {
+#online-chat-container code .number {
   color: #ae81ff;
 }
-code .comment {
+#online-chat-container code .comment {
   color: #75715e;
   font-style: italic;
 }
 
-#loading {
+#online-chat-container #loading {
   position: absolute;
   top: 50%; /* 将加载圆圈垂直居中 */
   left: 50%; /* 将加载圆圈水平居中 */
   transform: translate(-50%, -50%); /* 调整加载圆圈的位置 */
 }
 
-.loading-spinner {
+#online-chat-container .loading-spinner {
   width: 40px;
   height: 40px;
   border: 5px solid #f3f3f3;
@@ -185,7 +218,7 @@ code .comment {
   }
 }
 
-.function-button-container {
+#online-chat-container .function-button-container {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -194,7 +227,7 @@ code .comment {
   padding: 10px;
 }
 
-.function-button {
+#online-chat-container .function-button {
   padding: 8px 16px;
   background-color: #337ab7;
   color: #fff;
@@ -204,15 +237,15 @@ code .comment {
   margin-right: 10px;
 }
 
-.function-button:hover {
+#online-chat-container .function-button:hover {
   background-color: #23527c;
 }
 
-.function-button:active {
+#online-chat-container .function-button:active {
   background-color: #1c4566;
 }
 
-.clear-button {
+#online-chat-container .clear-button {
   position: absolute;
   right: 5px;
   bottom: 5px;
@@ -221,19 +254,19 @@ code .comment {
   font-size: 18px;
 }
 
-.clear-button:hover {
+#online-chat-container .clear-button:hover {
   color: #666;
 }
 
-.input-wrapper-with-clear-button {
+#online-chat-container .input-wrapper-with-clear-button {
   position: relative;
 }
 
-.input-wrapper-with-clear-button textarea {
+#online-chat-container .input-wrapper-with-clear-button textarea {
   padding-right: 30px;
 }
 
-.input-wrapper-with-clear-button .clear-button {
+#online-chat-container .input-wrapper-with-clear-button .clear-button {
   position: absolute;
   right: 10px;
   bottom: 18px;
