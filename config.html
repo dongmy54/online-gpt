@@ -1,17 +1,60 @@
-<!-- config.html -->
 <!DOCTYPE html>
 <html>
 <head>
   <title>Configure API Key</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 300px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #337ab7;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #23527c;
+    }
+  </style>
 </head>
 <body>
-  <h1>Configure API Key</h1>
-  <form id="config-form">
-    <label for="api-key">API Key:</label>
-    <input type="text" id="api-key" name="api-key">
-    <br>
-    <button type="submit">Save</button>
-  </form>
+  <div style="margin: 0 auto; max-width: 400px;">
+    <h1>Configure API Key</h1>
+    <form id="config-form">
+      <label for="api-key">API Key:</label>
+      <input type="text" id="api-key" name="api-key" placeholder="Enter your API key" required>
+      <br>
+      <button type="submit">Save</button>
+    </form>
+  </div>
 
   <script src="config.js"></script>
 </body>
