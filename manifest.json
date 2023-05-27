@@ -19,9 +19,7 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "tabs",
-    "storage",
-    "scripting"
+    "storage"
   ],
   "content_scripts": [
     {
