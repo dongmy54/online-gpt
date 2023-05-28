@@ -40,7 +40,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["new_style.css", "chat.html", "new_content.js"],
+      "resources": ["new_style.css", "chat.html", "new_content.js", "images/sent.png", "images/received.png"],
       "matches": ["*://*/*"]
     }
   ]

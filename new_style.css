@@ -150,7 +150,7 @@
   margin-left: 10px;
   margin-right: 0;
   /* 添加以下代码 */
-  background-image: url('/Users/dongmingyan/Downloads/Snip20230527_10.png');
+  background-image: url('/images/sent.png');
   background-size: cover;
 }
 
@@ -158,7 +158,7 @@
   margin-left: 0;
   margin-right: 10px;
   /* 添加以下代码 */
-  background-image: url('/Users/dongmingyan/Downloads/Snip20230527_11.png');
+  background-image: url('/images/received.png');
   background-size: cover;
 }
 
