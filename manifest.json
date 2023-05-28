@@ -19,12 +19,13 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "file:///*"
   ],
   "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": ["libs/marked.js", "content.js", "style.js"],
+      "js": ["libs/marked.js", "structure.js"],
       "run_at": "document_end"
     }
   ],
@@ -39,7 +40,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["style.css"],
+      "resources": ["new_style.css", "chat.html", "new_content.js"],
       "matches": ["*://*/*"]
     }
   ]

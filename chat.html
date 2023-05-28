@@ -1,0 +1,32 @@
+<!--聊天框整体结构-->
+<div class="chat-container" id="chat-container">
+  <div class="chat-header">
+    <span class="chat-person-name">多啦A梦</span>
+  </div>
+  <div id="chat-messages" class="chat-messages"></div>
+  <div class="chat-toolbar">
+    <div class="chat-buttons">
+      <button class="chat-button">翻译</button>
+      <button class="chat-button">解释</button>
+      <button class="chat-button">摘要</button>
+    </div>
+    <div class="chat-input">
+      <textarea id="message-input" placeholder="请输入消息..." rows="2"></textarea>
+      <button id="send-button">
+        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- chat 按钮 用于弹出聊天框 -->
+<div class="wrap-chat-button">
+  <button class="button" id="chat-button">
+    <div class="circle">chat</div>
+    <div class="rectangle"></div>
+  </button>
+</div>
+
