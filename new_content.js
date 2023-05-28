@@ -200,7 +200,7 @@ function requestGptStream(message) {
   fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer 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",
+      "Authorization": "Bearer xx",
       "Accept": "text/event-stream",
       "Content-Type": "application/json"
     },
