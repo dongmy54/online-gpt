@@ -2,10 +2,14 @@ const onlineGpt = document.getElementById("online-gpt");
 // 获取关联的 Shadow Root
 const shadowRoot = onlineGpt.shadowRoot;
 
-console.log(shadowRoot);
 // chat按钮控制
 const chatButton = shadowRoot.getElementById('chat-button');
 const chatContainer = shadowRoot.getElementById('chat-container');
+// 聊天框整体
+const messageInput = shadowRoot.getElementById("message-input");
+const sendButton = shadowRoot.getElementById("send-button");
+const chatMessages = shadowRoot.getElementById("chat-messages");
+const thinkingMessage = shadowRoot.getElementById('thinkingMessage');
 
 // 定义展开/收起聊天框的函数
 function toggleChat() {
@@ -19,10 +23,7 @@ chatButton.addEventListener('click', toggleChat);
 
 
 
-// 聊天框整体
-const messageInput = shadowRoot.getElementById("message-input");
-const sendButton = shadowRoot.getElementById("send-button");
-const chatMessages = shadowRoot.getElementById("chat-messages");
+
 
 sendButton.addEventListener("click", sendMessage);
 
@@ -151,6 +152,15 @@ messageInput.addEventListener("input", function () {
   }
 });
 
+// 显示思考中消息
+function showThinkingMessage() {
+  thinkingMessage.style.display = 'flex';
+}
+
+// 隐藏思考中消息
+function hideThinkingMessage() {
+  thinkingMessage.style.display = 'none';
+}
 
 
 
