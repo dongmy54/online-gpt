@@ -4,10 +4,6 @@
     <span class="chat-person-name">多啦A梦</span>
   </div>
   <div id="chat-messages" class="chat-messages">
-    <!-- 默认隐藏的思考中消息 -->
-    <div id="thinkingMessage" class="thinking-message" style="display: none;">
-      <span>思考中...</span>
-    </div>
   </div>
   <div class="chat-toolbar">
     <div class="chat-buttons">
@@ -16,6 +12,10 @@
       <button class="chat-button">摘要</button>
     </div>
     <div class="chat-input">
+      <!-- 默认隐藏的思考中消息 -->
+      <div id="thinkingMessage" class="thinking-message" style="display: none;">
+        <span>思考中...</span>
+      </div>
       <textarea id="message-input" placeholder="请输入消息..." rows="2"></textarea>
       <button id="send-button">
         <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em">

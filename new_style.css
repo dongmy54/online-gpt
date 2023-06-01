@@ -45,10 +45,9 @@
   align-items: center;
   justify-content: center;
   position: absolute;
-  bottom: 0;
+  bottom: 8px;
   left: 0;
   right: 0;
-  display: flex;
   padding: 10px;
   margin-left: 10px; /* 调整与文字内容的间距 */
 }
