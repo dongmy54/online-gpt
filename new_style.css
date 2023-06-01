@@ -148,7 +148,8 @@
   background-color: #E8F7FD;
   color: #333;
   margin-left: 0;
-  margin-right: auto
+  margin-right: auto;
+  position: relative;
 }
 
 .chat-message .message-bubble p {
@@ -283,19 +284,21 @@
 
 
 
-/* 响应光标动画 */
-@keyframes cursor-blink {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
-}
 
+/* 光标样式 */
 .cursor::after {
-  content: "";
-  display: inline-block;
+  content: '';
+  position: absolute;
   width: 2px;
   height: 20px;
-  background-color:#000;
-  animation: cursor-blink 1s infinite;
+  background-color: #000;
+  animation: blink-caret 1s step-end infinite;
+}
+
+/* 光标闪烁动画 */
+@keyframes blink-caret {
+  50% {
+    opacity: 0;
+  }
 }
 

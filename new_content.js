@@ -53,28 +53,53 @@ function receiveReply(message) {
   }, 1000);
 }
 
+// 目的是保证并发下字符不会乱掉
+var isTyping = false;
+var textQueue = [];
+
 // 打字机效果
 function typeWriterEffect(text, element) {
-  var index = 0;
-  var speed = 50; // 打字速度
-  var timer = setInterval(function () {
-    if (index < text.length) {
-      element.innerHTML += text.charAt(index);
-      // 动态调整滚动条
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      index++;
-    }
-  }, speed);
+  textQueue.push({ text: text, element: element });
+  // 首次进入打印 触发
+  if (!isTyping) {
+    isTyping = true;
+    processNextText();
+  }
 }
 
-// 最后的回复span元素
-function lastReplySpanElement(){
-  var receivedMessages = chatMessages.getElementsByClassName("chat-message received");
-  // 获取最后一条 chat-message received 元素
-  var lastReceivedMessage = receivedMessages[receivedMessages.length - 1];
-  messageBubble = lastReceivedMessage.querySelector('.message-bubble');
-  textSpan = messageBubble.querySelector('span');
-  return textSpan;
+// 处理字符输出
+function processNextText() {
+  // 队列还有内容或正在打印 一直循环执行
+  if (textQueue.length > 0 || isTyping) {
+    if (textQueue.length == 0){
+      sleep(300).then(() => {
+        console.log('为空等待');
+        processNextText();
+      });
+    } else {
+      var { text, element } = textQueue.shift();
+      var index = 0;
+
+      function typeNextChar() {
+        if (index < text.length) {
+          element.innerHTML += text.charAt(index);
+          // 动态调整滚动条
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+          index++;
+          requestAnimationFrame(typeNextChar);
+        } else {
+          processNextText();
+        }
+      }
+
+      typeNextChar();
+    }
+  }
+}
+
+// 等待方法
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // 用于添加发送的消息
@@ -106,39 +131,38 @@ function addMessage(text, isSent) {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-let firstStageReply = true;  // 是否为第一个阶段回复 - 控制是否新增头像和回复文本span
-let replyComplete   = false; // 回复是否完成 - 控制光标展示和生成动画
+// 当前回复textElement
+let currentReplayTextElement = null;  
+
+// 初始化回复textElement
+function iniReplayTextElement(){
+  var messageContainer = document.createElement("div");
+  messageContainer.classList.add("chat-message");
+  messageContainer.classList.add("received");
+
+  var avatarElement = document.createElement("div");
+  avatarElement.classList.add("avatar");
+
+  var textElement = document.createElement("span");
+  textElement.classList.add("text");
+  textElement.classList.add("cursor"); // 加光标闪烁效果
+
+  var messageBubble = document.createElement("div");
+  messageBubble.classList.add("message-bubble");
+  messageBubble.appendChild(textElement);
+
+  messageContainer.appendChild(avatarElement);
+  messageContainer.appendChild(messageBubble);
+  chatMessages.appendChild(messageContainer);
+
+  // 标记当前回复文本元素
+  currentReplayTextElement = textElement;
+}
 
 // 用于添加gpt回复的消息
 function addReplyMessage(text) {
-  if (firstStageReply){ // 新增
-    var messageContainer = document.createElement("div");
-    messageContainer.classList.add("chat-message");
-    messageContainer.classList.add("received");
-
-    var avatarElement = document.createElement("div");
-    avatarElement.classList.add("avatar");
-
-    var textElement = document.createElement("span");
-    textElement.classList.add("text");
-
-    var messageBubble = document.createElement("div");
-    messageBubble.classList.add("message-bubble");
-    messageBubble.appendChild(textElement);
-
-    messageContainer.appendChild(avatarElement);
-    messageContainer.appendChild(messageBubble);
-
-    chatMessages.appendChild(messageContainer);
-    firstStageReply = false;
-  } else {
-    textElement = lastReplySpanElement();
-  }
-
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-
   // 打字机效果
-  typeWriterEffect(text, textElement);
+  typeWriterEffect(text, currentReplayTextElement);
 }
 
 messageInput.addEventListener("input", function () {
@@ -176,6 +200,7 @@ const defaultChatMsgs = `hello,我是多啦A梦!快来和和我玩吧：
 addMessage(defaultChatMsgs);
 
 
+// 最终结果输出
 let resultText = '';
 
 function processStreamData(data) {
@@ -183,8 +208,10 @@ function processStreamData(data) {
   results.forEach((result) => {
     if (result.substr(6) == '[DONE]') {
       console.log('数据传输结束');
-      firstStageReply = false;
-      replyComplete   = true;
+      endResponse();
+      // 展示下最终结果
+      console.log(resultText);
+      resultText = "";
       // 进行数据传输结束后的逻辑处理
     } else {
       try {
@@ -192,25 +219,48 @@ function processStreamData(data) {
         const reply = resultObj.choices[0]?.delta?.content;
         if (reply) {
           resultText += reply;
-          console.log(resultText);
           // 在页面中展示回复消息
           addReplyMessage(reply);
-        } 
+        }
       } catch (error) {
-        console.log(`当前数据：----${result.substr(6)}----`);
         console.error("解析数据时出错:", error);
       }
     }
   });
 }
 
+// 禁用输入框
+function disableInput() {
+  messageInput.disabled = true;
+}
+
+// 启用输入框
+function enableInput() {
+  messageInput.disabled = false;
+}
+
+// 开始响应
+function startResponse(){
+  iniReplayTextElement();
+  showThinkingMessage();
+  disableInput();
+}
+
+// 结束响应
+function endResponse(){
+  currentReplayTextElement.classList.remove("cursor");
+  hideThinkingMessage();
+  enableInput();
+  isTyping = false; // 结束打印
+}
+
 function requestGptStream(message) {
-  firstStageReply = true;
-  replyComplete   = false;
+  startResponse();
+
   fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer xx",
+      "Authorization": "Bearer xxxx",
       "Accept": "text/event-stream",
       "Content-Type": "application/json"
     },
@@ -242,7 +292,13 @@ function requestGptStream(message) {
       });
     }
     read();
-  });
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    const errorMessage = `Oops! Something went wrong. ${error}`;
+    addReplyMessage(errorMessage);
+    endResponse();
+  })
 }
 
 // 示例用法
