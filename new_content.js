@@ -210,7 +210,8 @@ function processStreamData(data) {
       console.log('数据传输结束');
       endResponse();
       // 展示下最终结果
-      console.log(resultText);
+      var rawString = JSON.stringify(resultText);
+      console.log(rawString);
       resultText = "";
       // 进行数据传输结束后的逻辑处理
     } else {
@@ -260,7 +261,7 @@ function requestGptStream(message) {
   fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer xxxx",
+      "Authorization": "Bearer xxx",
       "Accept": "text/event-stream",
       "Content-Type": "application/json"
     },
@@ -271,6 +272,10 @@ function requestGptStream(message) {
     })
   })
   .then(response => {
+    if (!response.ok) {
+      throw new Error("API request failed.");
+    }
+    
     const stream = response.body;
     const reader = stream.getReader();
     let buffer = '';
@@ -295,7 +300,7 @@ function requestGptStream(message) {
   })
   .catch(error => {
     console.error("Error:", error);
-    const errorMessage = `Oops! Something went wrong. ${error}`;
+    const errorMessage = `发生了点错误. ${error}`;
     addReplyMessage(errorMessage);
     endResponse();
   })

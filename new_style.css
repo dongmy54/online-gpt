@@ -127,6 +127,7 @@
   border-radius: 8px;
   background-color: #dff3ff; /* 更换为淡蓝色背景 */
   color: #333; /* 调整字体颜色为深灰色 */
+  white-space: pre-line;
 }
 
 .chat-message.sent .message-bubble {
