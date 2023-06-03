@@ -15,8 +15,7 @@
     "default_popup": "config.html"
   },
   "permissions": [
-    "storage",
-    "file:///*"
+    "storage"
   ],
   "content_scripts": [
     {
