@@ -415,4 +415,42 @@ messageInput.addEventListener("keydown", function (e) {
 });
 
 
+// 清空事件
 cleanButton.addEventListener('click', clearMessage);
+
+
+
+
+
+// 添加鼠标按下事件监听器
+chatContainer.addEventListener('mousedown', dragStart);
+
+// 鼠标按下事件处理函数
+function dragStart(event) {
+  // 计算初始鼠标位置与聊天窗口位置之间的偏移量
+  const offsetX = event.clientX - chatContainer.getBoundingClientRect().left;
+  const offsetY = event.clientY - chatContainer.getBoundingClientRect().top;
+
+  // 添加鼠标移动和释放事件监听器
+  document.addEventListener('mousemove', dragElement);
+  document.addEventListener('mouseup', dragEnd);
+
+  // 阻止事件冒泡和默认行为
+  event.stopPropagation();
+  event.preventDefault();
+
+  // 元素拖动的回调函数
+  function dragElement(event) {
+    const newX = event.clientX - offsetX;
+    const newY = event.clientY - offsetY;
+    chatContainer.style.setProperty('left', newX + 'px');
+    chatContainer.style.setProperty('top', newY + 'px');
+  }
+
+  // 元素释放的回调函数
+  function dragEnd() {
+    // 移除鼠标移动和释放事件监听器
+    document.removeEventListener('mousemove', dragElement);
+    document.removeEventListener('mouseup', dragEnd);
+  }
+}
