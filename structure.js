@@ -14,7 +14,6 @@ xhr.open('GET', chatHTMLFilePath, true);
 xhr.onreadystatechange = function() {
   if (xhr.readyState === 4 && xhr.status === 200) {
     var htmlContent = xhr.responseText;
-    console.log("online-gpt html load success");
 
     // 创建一个 Shadow Root 必须依附于一个外部点
     const shadowRoot = onlineGpt.attachShadow({ mode: 'open' });
@@ -42,12 +41,28 @@ xhr.onreadystatechange = function() {
     const scriptElement = document.createElement('script');
     scriptElement.src = scriptPath;
     shadowRoot.appendChild(scriptElement);
-    console.log("shadow dom complete");
+
+    // 在 Shadow DOM 内容加载完后执行相关代码
+    window.onload = function() {
+      chrome.storage.local.get('OPENAI_API_KEY', function(result) {
+        // 创建自定义事件
+        var event = new CustomEvent('apiKeyUpdate', { detail: result.OPENAI_API_KEY});
+        // 分发自定义事件
+        document.dispatchEvent(event);
+      });
+    };
   }
 };
 xhr.send();
 
 
-
-
-
+// 监听 storage 变化事件
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  if (namespace === 'local' && changes.OPENAI_API_KEY) {
+    var newValue = changes.OPENAI_API_KEY.newValue;
+    // 创建自定义事件
+    var event = new CustomEvent('apiKeyUpdate', { detail: newValue });
+    // 分发自定义事件到 Shadow DOM 中
+    document.dispatchEvent(event);
+  }
+});

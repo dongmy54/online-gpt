@@ -14,7 +14,6 @@ const thinkingMessage = shadowRoot.getElementById('thinkingMessage');
 // 定义展开/收起聊天框的函数
 function toggleChat() {
   chatContainer.classList.toggle('show');
-  console.log('点击了');
 }
 
 // 点击按钮时触发展开/收起聊天框
@@ -39,8 +38,6 @@ function sendMessage() {
   if (message !== "") {
     addMessage(message, true);
     clearMessage();
-    // receiveReply(message);
-    // addReplyMessage("你好，我收到你的消息：" + message)
     requestGptStream(message);
   }
 }
@@ -73,7 +70,6 @@ function processNextText() {
   if (textQueue.length > 0 || isTyping) {
     if (textQueue.length == 0){
       sleep(300).then(() => {
-        console.log('为空等待');
         processNextText();
       });
     } else {
@@ -157,6 +153,8 @@ function iniReplayTextElement(){
 
   // 标记当前回复文本元素
   currentReplayTextElement = textElement;
+  // 动态调整滚动条
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // 用于添加gpt回复的消息
@@ -207,11 +205,10 @@ function processStreamData(data) {
   const results = data.trim().split('\n');
   results.forEach((result) => {
     if (result.substr(6) == '[DONE]') {
-      console.log('数据传输结束');
       endResponse();
       // 展示下最终结果
       var rawString = JSON.stringify(resultText);
-      console.log(rawString);
+      //console.log(rawString);
       resultText = "";
       // 进行数据传输结束后的逻辑处理
     } else {
@@ -255,13 +252,30 @@ function endResponse(){
   isTyping = false; // 结束打印
 }
 
+
+// 检查apiKey是否存在
+function checkApiKey(){
+  if (!apiKey){
+    addReplyMessage("请先到插件选项中配置 OpenAI API 密钥");
+    endResponse();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+// gpt 请求
 function requestGptStream(message) {
   startResponse();
+  if (checkApiKey()){ // api key 缺失
+    return;
+  }
 
   fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer xxx",
+      "Authorization": `Bearer ${apiKey}`,
       "Accept": "text/event-stream",
       "Content-Type": "application/json"
     },
@@ -325,6 +339,7 @@ summaryButton.addEventListener('click', sendButtonMessage);
 explainButton.addEventListener('click', sendButtonMessage);
 translateButton.addEventListener('click', sendButtonMessage);
 
+
 // 发送消息函数
 function sendButtonMessage(event) {
   // 阻止按钮的默认行为
@@ -365,5 +380,12 @@ function sendButtonMessage(event) {
   }
 }
 
+
+let apiKey = null;
+// 监听自定义事件
+document.addEventListener('apiKeyUpdate', function(event) {
+  // 获取传递的变量
+  apiKey = event.detail
+});
 
 

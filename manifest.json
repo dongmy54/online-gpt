@@ -3,10 +3,6 @@
   "name": "Online-GPT",
   "version": "1.0",
   "description": "Chat with GPT on any webpage",
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
   "host_permissions": [
     "https://api.openai.com"
   ],
@@ -19,6 +15,7 @@
     "default_popup": "popup.html"
   },
   "permissions": [
+    "tabs",
     "storage",
     "file:///*"
   ],
