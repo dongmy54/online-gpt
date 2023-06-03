@@ -391,7 +391,6 @@ document.addEventListener('apiKeyUpdate', function(event) {
 
 // 监听文本选择事件
 document.addEventListener("mouseup", function() {
-  console.log('选中文本');
   var selectedText = window.getSelection().toString();
 
   // 检查输入框是否可用
@@ -400,3 +399,16 @@ document.addEventListener("mouseup", function() {
   }
 });
 
+
+// 添加聊天框输入框的键盘事件监听器
+messageInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && e.shiftKey) {
+    // 如果按下 shift + Enter，则插入一个换行符，而不提交内容。
+    e.preventDefault();
+    messageInput.value += "\n";
+  } else if (e.key === "Enter") {
+    // 如果只按下 Enter 键，则提交内容。
+    e.preventDefault();
+    sendMessage();
+  }
+});
