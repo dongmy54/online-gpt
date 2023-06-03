@@ -12,6 +12,9 @@ const chatMessages = shadowRoot.getElementById("chat-messages");
 const thinkingMessage = shadowRoot.getElementById('thinkingMessage');
 const cleanButton = shadowRoot.getElementById("clean-button")
 
+// 获取用于拖动的区域元素
+const chatHeader = shadowRoot.querySelector('.chat-header');
+
 // 定义展开/收起聊天框的函数
 function toggleChat() {
   chatContainer.classList.toggle('show');
@@ -422,8 +425,9 @@ cleanButton.addEventListener('click', clearMessage);
 
 
 
+
 // 添加鼠标按下事件监听器
-chatContainer.addEventListener('mousedown', dragStart);
+chatHeader.addEventListener('mousedown', dragStart);
 
 // 鼠标按下事件处理函数
 function dragStart(event) {
@@ -454,3 +458,9 @@ function dragStart(event) {
     document.removeEventListener('mouseup', dragEnd);
   }
 }
+
+
+
+
+
+

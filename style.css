@@ -22,6 +22,11 @@
   text-align: center;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  cursor: grab;
+}
+
+.chat-header:hover {
+  cursor: grabbing;
 }
 
 .chat-person-name {
