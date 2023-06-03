@@ -12,17 +12,16 @@
       "48": "images/48icon.png",
       "128": "images/128icon.png"
     },
-    "default_popup": "popup.html"
+    "default_popup": "config.html"
   },
   "permissions": [
-    "tabs",
     "storage",
     "file:///*"
   ],
   "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": ["libs/marked.js", "structure.js"],
+      "js": ["structure.js"],
       "run_at": "document_end"
     }
   ],
@@ -37,7 +36,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["new_style.css", "chat.html", "new_content.js", "images/sent.png", "images/received.png"],
+      "resources": ["style.css", "chat.html", "content.js", "images/sent.png", "images/received.png"],
       "matches": ["*://*/*"]
     }
   ]

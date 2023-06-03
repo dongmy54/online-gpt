@@ -29,14 +29,14 @@ xhr.onreadystatechange = function() {
        ${htmlContent}
     `;
 
-    const styleSheetPath = chrome.runtime.getURL('new_style.css');
+    const styleSheetPath = chrome.runtime.getURL('style.css');
     // 创建一个<link>元素来加载样式表
     const linkElement = document.createElement('link');
     linkElement.rel = 'stylesheet';
     linkElement.href = styleSheetPath;
     shadowRoot.appendChild(linkElement);
 
-    const scriptPath = chrome.runtime.getURL('new_content.js');
+    const scriptPath = chrome.runtime.getURL('content.js');
     // 创建一个 <script> 元素
     const scriptElement = document.createElement('script');
     scriptElement.src = scriptPath;

@@ -1,394 +1,414 @@
-// 添加最外层容器
-const onlineChatContainer = document.createElement("div");
-onlineChatContainer.id = "online-chat-container";
-document.body.appendChild(onlineChatContainer);
+const onlineGpt = document.getElementById("online-gpt");
+// 获取关联的 Shadow Root
+const shadowRoot = onlineGpt.shadowRoot;
 
-// 添加聊天框元素
-const chatBoxDiv = document.createElement("div");
-chatBoxDiv.id = "chat-box";
-chatBoxDiv.style.display = "none" // 首次进入样式 此时css可能没生效
-onlineChatContainer.appendChild(chatBoxDiv);
+// chat按钮控制
+const chatButton = shadowRoot.getElementById('chat-button');
+const chatContainer = shadowRoot.getElementById('chat-container');
+// 聊天框整体
+const messageInput = shadowRoot.getElementById("message-input");
+const sendButton = shadowRoot.getElementById("send-button");
+const chatMessages = shadowRoot.getElementById("chat-messages");
+const thinkingMessage = shadowRoot.getElementById('thinkingMessage');
 
-// chat按钮-独立于chat-box
-const chatButtonWrapper = document.createElement("div");
-chatButtonWrapper.id = "chat-button-wrapper";
-onlineChatContainer.appendChild(chatButtonWrapper);
+// 定义展开/收起聊天框的函数
+function toggleChat() {
+  chatContainer.classList.toggle('show');
+}
+
+// 点击按钮时触发展开/收起聊天框
+chatButton.addEventListener('click', toggleChat);
+
+
+
+
+
+
+sendButton.addEventListener("click", sendMessage);
+
+// 清空输入框
+function clearMessage() {
+  messageInput.value = "";
+  messageInput.style.height = "auto";
+  messageInput.style.overflowY = "auto"; // 隐藏输入框的垂直滚动条
+}
+
+function sendMessage() {
+  var message = messageInput.value.trim();
+  if (message !== "") {
+    addMessage(message, true);
+    clearMessage();
+    requestGptStream(message);
+  }
+}
+
+function receiveReply(message) {
+  // 模拟简单的回复，实际应用中可以通过网络请求获取回复消息
+  var reply = "你好，我收到你的消息：" + message;
+  setTimeout(function () {
+    addMessage(reply);
+  }, 1000);
+}
+
+// 目的是保证并发下字符不会乱掉
+var isTyping = false;
+var textQueue = [];
+
+// 打字机效果
+function typeWriterEffect(text, element) {
+  textQueue.push({ text: text, element: element });
+  // 首次进入打印 触发
+  if (!isTyping) {
+    isTyping = true;
+    processNextText();
+  }
+}
+
+// 处理字符输出
+function processNextText() {
+  // 队列还有内容或正在打印 一直循环执行
+  if (textQueue.length > 0 || isTyping) {
+    if (textQueue.length == 0){
+      sleep(300).then(() => {
+        processNextText();
+      });
+    } else {
+      var { text, element } = textQueue.shift();
+      var index = 0;
+
+      function typeNextChar() {
+        if (index < text.length) {
+          element.innerHTML += text.charAt(index);
+          // 动态调整滚动条
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+          index++;
+          requestAnimationFrame(typeNextChar);
+        } else {
+          processNextText();
+        }
+      }
+
+      typeNextChar();
+    }
+  }
+}
+
+// 等待方法
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// 用于添加发送的消息
+function addMessage(text, isSent) {
+  var messageContainer = document.createElement("div");
+  messageContainer.classList.add("chat-message");
+
+  if (isSent) {
+    messageContainer.classList.add("sent");
+  } else {
+    messageContainer.classList.add("received");
+  }
+
+  var avatarElement = document.createElement("div");
+  avatarElement.classList.add("avatar");
+
+  var textElement = document.createElement("span");
+  textElement.classList.add("text");
+  textElement.innerText = text;
+
+  var messageBubble = document.createElement("div");
+  messageBubble.classList.add("message-bubble");
+  messageBubble.appendChild(textElement);
+
+  messageContainer.appendChild(avatarElement);
+  messageContainer.appendChild(messageBubble);
+
+  chatMessages.appendChild(messageContainer);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// 当前回复textElement
+let currentReplayTextElement = null;  
+
+// 初始化回复textElement
+function iniReplayTextElement(){
+  var messageContainer = document.createElement("div");
+  messageContainer.classList.add("chat-message");
+  messageContainer.classList.add("received");
+
+  var avatarElement = document.createElement("div");
+  avatarElement.classList.add("avatar");
+
+  var textElement = document.createElement("span");
+  textElement.classList.add("text");
+  textElement.classList.add("cursor"); // 加光标闪烁效果
+
+  var messageBubble = document.createElement("div");
+  messageBubble.classList.add("message-bubble");
+  messageBubble.appendChild(textElement);
+
+  messageContainer.appendChild(avatarElement);
+  messageContainer.appendChild(messageBubble);
+  chatMessages.appendChild(messageContainer);
+
+  // 标记当前回复文本元素
+  currentReplayTextElement = textElement;
+  // 动态调整滚动条
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// 用于添加gpt回复的消息
+function addReplyMessage(text) {
+  // 打字机效果
+  typeWriterEffect(text, currentReplayTextElement);
+}
+
+messageInput.addEventListener("input", function () {
+  this.style.height = "auto";
+  this.style.height = this.scrollHeight + "px";
+
+  if (this.scrollHeight > parseInt(getComputedStyle(this).maxHeight)) {
+    this.style.overflowY = "scroll";
+  } else {
+    this.style.overflowY = "hidden";
+  }
+});
+
+// 显示思考中消息
+function showThinkingMessage() {
+  thinkingMessage.style.display = 'flex';
+}
+
+// 隐藏思考中消息
+function hideThinkingMessage() {
+  thinkingMessage.style.display = 'none';
+}
 
 
 
 // 添加默认聊天内容
-const defaultChatMsgs = [
-  {
-    message: "欢迎来到online-gpt!\n 1. 你可以像在使用gpt那样聊天;\n 2. 也可以点击翻译、解释、摘要按钮，对输入框中的内容进行翻译、解释、生成摘要;\n 3. 当你选中网页上任何一段文本后,文本内容将自动填入输入框;\n 4. 摘要支持对网页整个页面内容进行摘要（输入框可以不输入内容）",
-    from: "bot",
-    time: new Date(),
-  },
-];
-let chatMsgs = defaultChatMsgs;
+const defaultChatMsgs = `hello,我是多啦A梦!快来和和我玩吧：
 
-// 创建聊天框头部
-const chatHeader = document.createElement("div");
-chatHeader.id = "chat-header";
-chatHeader.innerHTML = "<p>Online GPT</p>";
-chatBoxDiv.appendChild(chatHeader);
+1.和我聊天，我会给你热情而有趣的回答！解答问题、聊天互动，让我们一起探索这个神奇的世界吧！
+2.魔法瞬译、解解谜：点击翻译或解释按钮，我能帮你把文字翻译成其他语言，或解释一些超棒的词汇。让我们一起解开世界的谜题！
+3.抓取网页文字的魔法手：选中网页上的文字，我会把它自动填入输入框。省去你的时间和劳动，让我们更快乐地互动吧！
+摘要魔术秀：
+4.我能帮你提取网页的要点，生成简洁的摘要。让我们快速捕捉信息的精华，一起掌握重点！
+`;
+addMessage(defaultChatMsgs);
 
-// 创建聊天框关闭按钮
-const closeButton = document.createElement("span");
-closeButton.id = "close-button";
-closeButton.innerHTML = "&#10005;";
-chatHeader.appendChild(closeButton);
 
-// 添加关闭按钮的点击事件监听器
-closeButton.addEventListener("click", function () {
-  closeChatBox();
-});
+// 最终结果输出
+let resultText = '';
 
-// 创建聊天消息列表
-const chatMsgList = document.createElement("ul");
-chatMsgList.id = "chat-msg-list";
-chatBoxDiv.appendChild(chatMsgList);
-
-// 将默认聊天内容添加到聊天消息列表
-renderChatMsgs();
-
-// 创建聊天输入框
-const chatInputWrapper = document.createElement("div");
-chatInputWrapper.id = "chat-input-wrapper";
-const chatInput = document.createElement("textarea");
-chatInput.id = "chat-input";
-chatInput.placeholder = "Type your message...";
-chatInputWrapper.appendChild(chatInput);
-chatBoxDiv.appendChild(chatInputWrapper);
-
-// 添加聊天框输入框的键盘事件监听器
-chatInput.addEventListener("keydown", function (e) {
-  if (e.key === "Enter" && e.shiftKey) {
-    // 如果按下 shift + Enter，则插入一个换行符，而不提交内容。
-    e.preventDefault();
-    chatInput.value += "\n";
-  } else if (e.key === "Enter") {
-    // 如果只按下 Enter 键，则提交内容。
-    e.preventDefault();
-
-    const message = chatInput.value;
-    if (message.trim()){
-      sendMessage(message);
+function processStreamData(data) {
+  const results = data.trim().split('\n');
+  results.forEach((result) => {
+    if (result.substr(6) == '[DONE]') {
+      endResponse();
+      // 展示下最终结果
+      var rawString = JSON.stringify(resultText);
+      //console.log(rawString);
+      resultText = "";
+      // 进行数据传输结束后的逻辑处理
+    } else {
+      try {
+        const resultObj = JSON.parse(result.substr(6));
+        const reply = resultObj.choices[0]?.delta?.content;
+        if (reply) {
+          resultText += reply;
+          // 在页面中展示回复消息
+          addReplyMessage(reply);
+        }
+      } catch (error) {
+        console.error("解析数据时出错:", error);
+      }
     }
+  });
+}
+
+// 禁用输入框
+function disableInput() {
+  messageInput.disabled = true;
+}
+
+// 启用输入框
+function enableInput() {
+  messageInput.disabled = false;
+}
+
+// 开始响应
+function startResponse(){
+  iniReplayTextElement();
+  showThinkingMessage();
+  disableInput();
+}
+
+// 结束响应
+function endResponse(){
+  currentReplayTextElement.classList.remove("cursor");
+  hideThinkingMessage();
+  enableInput();
+  isTyping = false; // 结束打印
+}
+
+
+// 检查apiKey是否存在
+function checkApiKey(){
+  if (!apiKey){
+    addReplyMessage("请先到插件选项中配置 OpenAI API 密钥");
+    endResponse();
+    return true;
+  } else {
+    return false;
   }
-});
+}
 
 
-// 添加发送消息的函数
-function sendMessage(message) {
-  if (!apiKey) {
-    // 未获取到 API 密钥，弹窗提示
-    alert('请先到插件选项中配置 OpenAI API 密钥');
-    location.reload(); // 刷新当前页面
+// gpt 请求
+function requestGptStream(message) {
+  startResponse();
+  if (checkApiKey()){ // api key 缺失
     return;
   }
-  
-  chatMsgs.push({
-    message: message,
-    from: "user",
-    time: new Date(),
-  });
-  chatInput.value = "";
-  renderChatMsgs();
-  showLoading();
-  respondToMessage(message);
-}
 
-// 添加聊天按钮元素并将其添加到页面中
-const chatButton = document.createElement("button");
-chatButton.id = "chat-button";
-chatButton.innerText = "Chat";
-chatButtonWrapper.appendChild(chatButton);
-
-// 添加点击事件监听器以打开/关闭聊天框
-chatButton.addEventListener("click", function () {
-  if (chatBoxDiv.style.display === "none") {
-    openChatBox();
-  } else {
-    closeChatBox();
-  }
-});
-
-// 添加打开/关闭聊天框的函数
-function openChatBox() {
-  if (!document.body.contains(chatBoxDiv)) {
-    document.body.appendChild(chatBoxDiv);
-  }
-  hideLoading();// 一开始加载动画是隐藏的
-  chatBoxDiv.style.display = "block";
-  chatButtonWrapper.style.display = "none"; // 隐藏聊天按钮
-}
-
-function closeChatBox() {
-  chatBoxDiv.style.display = "none";
-  chatButtonWrapper.style.display = "block"; // 显示聊天按钮 
-}
-
-// 渲染聊天消息列表
-function renderChatMsgs() {
-  chatMsgList.innerHTML = "";
-  chatMsgs.forEach((msg) => {
-    const li = document.createElement("li");
-    li.className = msg.from === "bot" ? "msg-bot" : "msg-user";
-    li.innerHTML = parseMarkdown(msg.message); // 解析 Markdown 内容并设置 innerHTML
-    chatMsgList.appendChild(li);
-  });
-  chatMsgList.scrollTop = chatMsgList.scrollHeight;
-}
-
-// 解析 Markdown 内容并添加美化样式
-function parseMarkdown(content) {
-  if (typeof marked === 'object' && marked.parse) {
-    const html = marked.parse(content);
-    const div = document.createElement('div');
-    div.innerHTML = html;
-
-    // 添加自定义 CSS 样式
-    div.querySelectorAll('p').forEach((p) => {
-      p.classList.add('markdown-p');
-    });
-    div.querySelectorAll('pre').forEach((pre) => {
-      pre.classList.add('markdown-pre');
-    });
-    div.querySelectorAll('code').forEach((code) => {
-      code.classList.add('markdown-code');
-    });
-
-    return div.innerHTML;
-  } else {
-    return content;
-  }
-}
-
-// 创建加载圆圈元素
-const loadingDiv = document.createElement("div");
-loadingDiv.id = "loading";
-const spinnerDiv = document.createElement("div");
-spinnerDiv.classList.add("loading-spinner");
-loadingDiv.appendChild(spinnerDiv);
-chatInputWrapper.appendChild(loadingDiv);
-
-
-// 显示加载动画
-function showLoading() {
-  const loadingDiv = document.getElementById("loading");
-  if (loadingDiv) {
-    loadingDiv.style.display = "block";
-  }
-  chatInput.disabled = true; // 禁用聊天输入框
-}
-
-// 隐藏加载动画
-function hideLoading() {
-  const loadingDiv = document.getElementById("loading");
-  if (loadingDiv) {
-    loadingDiv.style.display = "none";
-  }
-  chatInput.disabled = false; // 启用聊天输入框
-}
-
-
-// 设置你的 OpenAI API 密钥
-let apiKey;
-
-chrome.storage.local.get('OPENAI_API_KEY', function(result) {
-  apiKey = result.OPENAI_API_KEY;
-
-  // 检查是否成功获取到 API 密钥
-  if (!apiKey) {
-    // 未获取到 API 密钥，弹窗提示
-    console.log('请先到插件选项中配置 OpenAI API 密钥');
-    return;
-  }
-})
-
-
-// 更新 respondToMessage 函数
-function respondToMessage(message) {
-  const apiUrl = "https://api.openai.com/v1/chat/completions";
-
-  fetch(apiUrl, {
+  fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`
+      "Authorization": `Bearer ${apiKey}`,
+      "Accept": "text/event-stream",
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "user", content: message }
-      ]
+      "model": "gpt-3.5-turbo",
+      "messages": [{"role": "user", "content": message}],
+      "stream": true
     })
   })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("API request failed.");
-      }
-      return response.json();
-    })
-    .then(data => {
-      const replyMessage = data.choices[0].message.content;
-      console.log(`${replyMessage}`);
-      chatMsgs.push({
-        message: replyMessage,
-        from: "bot",
-        time: new Date(),
-      });
-      renderChatMsgs();
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      const errorMessage = `Oops! Something went wrong. Error: ${error}`;
-      chatMsgs.push({
-        message: errorMessage,
-        from: "bot",
-        time: new Date(),
-      });
-      renderChatMsgs();
-    })
-    .finally(() => {
-      // 隐藏加载动画
-      hideLoading();
-    });
-    ;
-}
-
-
-// 显示默认聊天消息
-function showDefaultChatMsgs() {
-  chatMsgs = defaultChatMsgs;
-  renderChatMsgs();
-}
-showDefaultChatMsgs();
-
-
-// 获取页面内容
-function getPageContent() {
-  // 获取网页中的所有 <p> 标签元素（排除 chat-box 元素）
-  var elements = document.querySelectorAll('p:not(#chat-box p)');
-
-  // 创建一个空数组用于存储文本内容
-  var contentArray = [];
-
-  // 遍历标签元素，获取文本内容并添加到数组中
-  elements.forEach(function(element) {
-    var textContent = element.textContent.trim();
-    if (textContent.length > 0) {
-      contentArray.push(textContent);
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("API request failed.");
     }
-  });
-
-  // 将数组中的文本内容整合成一个完整的文本
-  var completeContent = contentArray.join('\n');
-
-  return completeContent;
+    
+    const stream = response.body;
+    const reader = stream.getReader();
+    let buffer = '';
+    
+    function read() {
+      reader.read().then(({ done, value }) => {
+        if (value) {
+          const text = new TextDecoder("utf-8").decode(value);
+          buffer += text;
+          const results = buffer.split('\n\n');
+          buffer = results.pop();
+          results.forEach((result) => {
+            processStreamData(result);
+          });
+        }
+        if (!done) {
+          read();
+        }
+      });
+    }
+    read();
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    const errorMessage = `发生了点错误. ${error}`;
+    addReplyMessage(errorMessage);
+    endResponse();
+  })
 }
 
-// 调用函数获取网页内容
-var pageContent = getPageContent();
 
 
 
-// 添加按钮容器
-const functionButtonContainer = document.createElement("div");
-functionButtonContainer.className = "function-button-container";
+// 功能按钮相关
+// 获取按钮和输入框元素
+const summaryButton = shadowRoot.getElementById('summaryButton');
+const explainButton = shadowRoot.getElementById('explainButton');
+const translateButton = shadowRoot.getElementById('translateButton');
 
-// 创建按钮的通用函数
-function createButton(className, label, clickHandler) {
-  const button = document.createElement("button");
-  button.className = "function-button " + className;
-  button.textContent = label;
-  button.addEventListener("click", clickHandler);
-  functionButtonContainer.appendChild(button);
-}
+// 定义消息模板
+const summaryTemplate = '用中文简要概述下面内容,要求体现关键点,不超过100字: \n #{message}';
+const explainTemplate = '用专业的方式解释下面的内容，专业词语单独列出解释\n: #{message}';
+const translateTemplate = '翻译下面的内容为中文\n: #{message}';
 
-// 应用模版函数
-function applyTemplate(template, message) {
-  // 使用正则表达式替换模版中的占位符 %{message} 为实际内容
-  var modifiedContent = template.replace("%{message}%", message);
-  return modifiedContent;
-}
+// 监听按钮点击事件
+summaryButton.addEventListener('click', sendButtonMessage);
+explainButton.addEventListener('click', sendButtonMessage);
+translateButton.addEventListener('click', sendButtonMessage);
 
-// 翻译按钮的点击处理函数
-function translateMessage() {
-  const message = chatInput.value.trim();
+
+// 发送消息函数
+function sendButtonMessage(event) {
+  // 阻止按钮的默认行为
+  event.preventDefault();
+
+  // 获取按钮类型和消息内容
+  const buttonType = event.target.id;
+  const messageContent = messageInput.value.trim();
+
+  // 检查消息内容是否为空
+  if (messageContent === '') {
+    return;
+  }
+
+  // 根据按钮类型选择对应的消息模板
+  let messageTemplate = '';
+  switch (buttonType) {
+    case 'summaryButton':
+      messageTemplate = summaryTemplate;
+      break;
+    case 'explainButton':
+      messageTemplate = explainTemplate;
+      break;
+    case 'translateButton':
+      messageTemplate = translateTemplate;
+      break;
+    default:
+      break;
+  }
+
+  // 生成消息
+  const message = messageTemplate.replace('#{message}', messageContent);
+
   if (message !== "") {
-    const template = "将下面内容翻译为中文：\n %{message}%";
-    const translatedMessage = applyTemplate(template, message);
-    sendMessage(translatedMessage);
+    addMessage(messageContent, true); // 这里只给出消息框中的内容
+    clearMessage();
+    requestGptStream(message);
   }
 }
 
-// 解释按钮的点击处理函数
-function explainMessage() {
-  const message = chatInput.value.trim();
-  if (message !== "") {
-    const template = "详细解释下面内容：\n %{message}%";
-    const explainedMessage = applyTemplate(template, message);
-    sendMessage(explainedMessage);
-  }
-}
 
-// 摘要按钮的点击处理函数
-function summarizeMessage() {
-  var message = "";
-  var chatInput = document.getElementById("chat-input");
-
-  // 检查输入框中是否有内容
-  if (chatInput.value.trim().length > 0) {
-    message = chatInput.value.trim(); // 从输入框获取文本作为摘要的消息
-  } else {
-    message = getPageContent(); // 从整个网页获取文本作为摘要的消息
-  }
-
-  const template = "将下面内容生成中文摘要：\n %{message}%";
-  const summary = applyTemplate(template, message);
-
-  sendMessage(summary);
-}
-
-
-// 创建翻译按钮
-createButton("translation-button", "翻译", translateMessage);
-// 创建解释按钮
-createButton("explanation-button", "解释", explainMessage);
-// 创建摘要按钮
-createButton("summary-button", "摘要", summarizeMessage);
-
-// 将按钮容器添加到 chat-input-wrapper 元素前面
-chatInputWrapper.parentNode.insertBefore(functionButtonContainer, chatInputWrapper);
+let apiKey = null;
+// 监听自定义事件 在shadow中是可以监听的
+document.addEventListener('apiKeyUpdate', function(event) {
+  // 获取传递的变量
+  apiKey = event.detail
+});
 
 
 // 监听文本选择事件
-document.addEventListener("mouseup", function(event) {
+document.addEventListener("mouseup", function() {
   var selectedText = window.getSelection().toString();
 
-  // 检查聊天框是否处于显示状态
-  var chatBox = document.getElementById("chat-box");
-  if (chatBox.style.display === "block" && selectedText.length > 0) {
-    var chatInput = document.getElementById("chat-input");
-    chatInput.value = selectedText;
+  // 检查输入框是否可用
+  if (!messageInput.disabled && selectedText.length > 0) {
+    messageInput.value = selectedText;
   }
 });
 
 
-// 创建清除按钮
-const clearButton = document.createElement("span");
-clearButton.className = "clear-button";
-clearButton.innerHTML = "清除"; // 使用 HTML 实体编码表示 "✕"
-
-// 点击清除按钮时清空聊天输入框
-clearButton.addEventListener("click", function () {
-  chatInput.value = "";
+// 添加聊天框输入框的键盘事件监听器
+messageInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && e.shiftKey) {
+    // 如果按下 shift + Enter，则插入一个换行符，而不提交内容。
+    e.preventDefault();
+    messageInput.value += "\n";
+  } else if (e.key === "Enter") {
+    // 如果只按下 Enter 键，则提交内容。
+    e.preventDefault();
+    sendMessage();
+  }
 });
-
-// 将清除按钮添加到聊天输入框中
-chatInputWrapper.appendChild(clearButton);
-// 添加样式类到聊天输入框容器
-chatInputWrapper.classList.add("input-wrapper-with-clear-button");
-
-
