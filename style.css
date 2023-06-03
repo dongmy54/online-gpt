@@ -219,6 +219,10 @@
   background-color: #7898C5;
 }
 
+#clean-button {
+  position: absolute;
+  right: 0;
+}
 #message-input:focus {
   outline: none;
   box-shadow: 0 0 0 2px #ABC2D9; /* Added */

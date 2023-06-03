@@ -10,6 +10,7 @@ const messageInput = shadowRoot.getElementById("message-input");
 const sendButton = shadowRoot.getElementById("send-button");
 const chatMessages = shadowRoot.getElementById("chat-messages");
 const thinkingMessage = shadowRoot.getElementById('thinkingMessage');
+const cleanButton = shadowRoot.getElementById("clean-button")
 
 // 定义展开/收起聊天框的函数
 function toggleChat() {
@@ -412,3 +413,6 @@ messageInput.addEventListener("keydown", function (e) {
     sendMessage();
   }
 });
+
+
+cleanButton.addEventListener('click', clearMessage);
