@@ -382,10 +382,21 @@ function sendButtonMessage(event) {
 
 
 let apiKey = null;
-// 监听自定义事件
+// 监听自定义事件 在shadow中是可以监听的
 document.addEventListener('apiKeyUpdate', function(event) {
   // 获取传递的变量
   apiKey = event.detail
 });
 
+
+// 监听文本选择事件
+document.addEventListener("mouseup", function() {
+  console.log('选中文本');
+  var selectedText = window.getSelection().toString();
+
+  // 检查输入框是否可用
+  if (!messageInput.disabled && selectedText.length > 0) {
+    messageInput.value = selectedText;
+  }
+});
 
