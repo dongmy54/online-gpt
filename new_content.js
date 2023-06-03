@@ -301,9 +301,64 @@ function requestGptStream(message) {
   })
 }
 
-// 示例用法
-// const userInput = "世界上有多少人";
-// showUserMessage(userInput);
-//requestGptStream(userInput);
+
+
+
+// 功能按钮相关
+// 获取按钮和输入框元素
+const summaryButton = shadowRoot.getElementById('summaryButton');
+const explainButton = shadowRoot.getElementById('explainButton');
+const translateButton = shadowRoot.getElementById('translateButton');
+
+// 定义消息模板
+const summaryTemplate = '用中文简要概述下面内容,要求体现关键点,不超过100字: \n #{message}';
+const explainTemplate = '用专业的方式解释下面的内容，专业词语单独列出解释\n: #{message}';
+const translateTemplate = '翻译下面的内容为中文\n: #{message}';
+
+// 监听按钮点击事件
+summaryButton.addEventListener('click', sendButtonMessage);
+explainButton.addEventListener('click', sendButtonMessage);
+translateButton.addEventListener('click', sendButtonMessage);
+
+// 发送消息函数
+function sendButtonMessage(event) {
+  // 阻止按钮的默认行为
+  event.preventDefault();
+
+  // 获取按钮类型和消息内容
+  const buttonType = event.target.id;
+  const messageContent = messageInput.value.trim();
+
+  // 检查消息内容是否为空
+  if (messageContent === '') {
+    return;
+  }
+
+  // 根据按钮类型选择对应的消息模板
+  let messageTemplate = '';
+  switch (buttonType) {
+    case 'summaryButton':
+      messageTemplate = summaryTemplate;
+      break;
+    case 'explainButton':
+      messageTemplate = explainTemplate;
+      break;
+    case 'translateButton':
+      messageTemplate = translateTemplate;
+      break;
+    default:
+      break;
+  }
+
+  // 生成消息
+  const message = messageTemplate.replace('#{message}', messageContent);
+
+  if (message !== "") {
+    addMessage(messageContent, true); // 这里只给出消息框中的内容
+    clearMessage();
+    requestGptStream(message);
+  }
+}
+
 
 
